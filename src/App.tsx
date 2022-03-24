@@ -39,7 +39,7 @@ function App() {
     >
       {todo.text}
       <button
-        className="p-2 ml-2 rounded-md bg-black text-white hover:bg-gray-600"
+        className="p-2 ml-2 rounded-md bg-black text-white hover:bg-gray-600 w-24"
         onClick={() => {
           // toggleTodo(todo);
           setTodos((prevState) => {
