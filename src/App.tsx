@@ -27,8 +27,9 @@ function App() {
       place: { custom: "market" },
       deleted: false,
     },
-    { id: 4, text: "Mark all todos as complete", done: false, deleted: false },
+    { id: 6, text: "Mark all todos as complete", done: false, deleted: false },
     { id: 5, text: "Un-delete a todo", done: false, deleted: true },
+    { id: 4, text: "Mark a todo as uncompleted", done: true, deleted: false },
   ];
 
   const initialNewTodo: NewTodo = {
