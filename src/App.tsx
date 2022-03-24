@@ -2,8 +2,10 @@ import React, { useState } from "react";
 
 function App() {
   const initialTodos: Todo[] = [
-    { id: 1, text: "First todo", done: false },
-    { id: 2, text: "Second todo", done: false },
+    { id: 1, text: "Walk the dog", done: false, place: "home" },
+    { id: 2, text: "Finish project proposal", done: false, place: "work" },
+    { id: 3, text: "Buy groceries", done: false, place: { custom: "market" } },
+    { id: 4, text: "Be mindful", done: false },
   ];
 
   const [todos, setTodos] = useState(initialTodos);
@@ -20,6 +22,18 @@ function App() {
     readonly done: true;
   };
 
+  function placeToString(place: Place): string | null {
+    // Takes a Place and returns a string
+    // that can be used for the place label UI
+    if (place === "home" || place === "work") {
+      return place;
+    } else if (place.custom.length) {
+      return place.custom;
+    } else {
+      return null;
+    }
+  }
+
   function toggleTodo(todo: Todo): Todo {
     return {
       ...todo,
@@ -35,11 +49,17 @@ function App() {
   }
 
   const renderedTodos = todos.map((todo: Todo) => (
-    <li
-      key={todo.id}
-      className={"mb-2 " + (todo.done ? "line-through text-gray-700" : "")}
-    >
-      {todo.text}
+    <li key={todo.id} className="mb-2 flex flex-row justify-between">
+      <div
+        className={"flex-1 " + (todo.done ? "line-through text-gray-700" : "")}
+      >
+        {todo.text}
+      </div>
+      {todo.place ? (
+        <div className="ml-2 p-2 rounded-md border border:black bg-white">
+          {placeToString(todo.place)}
+        </div>
+      ) : null}
       <button
         className="p-2 ml-2 rounded-md bg-black text-white hover:bg-gray-600 w-24"
         onClick={() => {
