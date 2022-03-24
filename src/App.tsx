@@ -1,6 +1,8 @@
 import React, { SyntheticEvent, useState } from "react";
 import { AiOutlineHome } from "react-icons/ai";
-import { BsFillBriefcaseFill, BsFillPinMapFill } from "react-icons/bs";
+import { BsFillBriefcaseFill, BsFillPinMapFill, BsTrash } from "react-icons/bs";
+import { FaTrashRestoreAlt } from "react-icons/fa";
+import { RiCheckboxLine, RiCheckboxBlankLine } from "react-icons/ri";
 
 function App() {
   const initialTodos: Todo[] = [
@@ -26,7 +28,7 @@ function App() {
       deleted: false,
     },
     { id: 4, text: "Mark all todos as complete", done: false, deleted: false },
-    { id: 5, text: "Undelete a todo", done: false, deleted: true },
+    { id: 5, text: "Un-delete a todo", done: false, deleted: true },
   ];
 
   const initialNewTodo: NewTodo = {
@@ -84,7 +86,7 @@ function App() {
     if (place.custom) {
       return {
         text: place.custom,
-        icon: <BsFillPinMapFill className="mr-2" />,
+        icon: <BsFillPinMapFill />,
       };
     }
     return { text: null, icon: null };
@@ -182,26 +184,15 @@ function App() {
     )
   );
 
-  const deletedTodos: JSX.Element[] = todos
-    .filter((todo) => todo.deleted)
-    .sort((a, b) => a.id - b.id)
-    .map((todo: Todo) => (
+  function renderTodos(showDeleted: boolean): JSX.Element[] {
+    let filteredTodos = todos
+      .filter((todo) => todo.deleted === showDeleted)
+      .sort((a, b) => a.id - b.id);
+
+    return filteredTodos.map((todo: Todo) => (
       <li key={todo.id} className="mb-2 flex flex-row justify-between">
-        <div
-          className={
-            "flex-1 " + (todo.done ? "line-through text-gray-700" : "")
-          }
-        >
-          {todo.text}
-        </div>
-        {todo.place ? (
-          <div className="ml-2 p-2 rounded-md border border:black bg-white flex flex-row">
-            {placeLabel(todo.place).icon}
-            {placeLabel(todo.place).text}
-          </div>
-        ) : null}
         <button
-          className="p-2 ml-2 rounded-md bg-black text-white hover:bg-gray-600 cursor-pointer w-24"
+          className="p-2 mr-2 rounded-md bg-black text-white hover:bg-gray-600 cursor-pointer"
           onClick={() => {
             setTodos((prevState) => {
               return [
@@ -211,84 +202,56 @@ function App() {
             });
           }}
         >
-          {todo.done ? "undo" : "complete"}
+          {todo.done ? <RiCheckboxLine /> : <RiCheckboxBlankLine />}
         </button>
+        <div
+          className={
+            "flex-1 " + (todo.done ? "line-through text-gray-700" : "")
+          }
+        >
+          {todo.text}
+        </div>
+        {todo.place ? (
+          <div className="p-2 rounded-md border border:black bg-white flex flex-row">
+            {placeLabel(todo.place).icon}
+            <div className="hidden md:block md:pl-2">
+              {placeLabel(todo.place).text}
+            </div>
+          </div>
+        ) : null}
         <button
-          className="ml-2 p-2 rounded-md bg-green-900 text-white hover:bg-green-700"
-          onClick={() => {
+          className={
+            "ml-2 p-2 rounded-md  text-white " +
+            (showDeleted
+              ? "bg-green-900 hover:bg-green-700"
+              : "bg-red-900 hover:bg-red-700")
+          }
+          onClick={() =>
             setTodos((prevState) => {
               return [
                 ...prevState.filter((el) => el.id !== todo.id),
                 toggleDeleteTodo(todo),
               ];
-            });
-          }}
-        >
-          restore
-        </button>
-      </li>
-    ));
-
-  const liveTodos: JSX.Element[] = todos
-    .filter((todo) => !todo.deleted)
-    .sort((a, b) => a.id - b.id)
-    .map((todo: Todo) => (
-      <li key={todo.id} className="mb-2 flex flex-row justify-between">
-        <div
-          className={
-            "flex-1 " + (todo.done ? "line-through text-gray-700" : "")
+            })
           }
         >
-          {todo.text}
-        </div>
-        {todo.place ? (
-          <div className="ml-2 p-2 rounded-md border border:black bg-white flex flex-row">
-            {placeLabel(todo.place).icon}
-            {placeLabel(todo.place).text}
-          </div>
-        ) : null}
-        <button
-          className="p-2 ml-2 rounded-md bg-black text-white hover:bg-gray-600 cursor-pointer w-24"
-          onClick={() => {
-            setTodos((prevState) => {
-              return [
-                ...prevState.filter((el) => el.id !== todo.id),
-                toggleCompleteTodo(todo),
-              ];
-            });
-          }}
-        >
-          {todo.done ? "undo" : "complete"}
-        </button>
-        <button
-          className="ml-2 p-2 rounded-md bg-red-900 text-white hover:bg-red-700"
-          onClick={() => {
-            if (window.confirm("Are you sure you want to delete this todo?")) {
-              setTodos((prevState) => {
-                return [
-                  ...prevState.filter((el) => el.id !== todo.id),
-                  toggleDeleteTodo(todo),
-                ];
-              });
-            }
-          }}
-        >
-          delete
+          {todo.deleted ? <FaTrashRestoreAlt /> : <BsTrash />}
         </button>
       </li>
     ));
+  }
 
   return (
     <div className="container mx-auto flex flex-col items-center">
       <header className="my-4 text-3xl">TODOS</header>
-      <ul className="w-5/6 md:w-1/2">{liveTodos}</ul>
+      <ul className="w-5/6 md:w-4/5">{renderTodos(false)}</ul>
       <button
         className="p-2 mb-2 rounded-md bg-black text-white hover:bg-gray-600 cursor-pointer"
         onClick={() => setTodos((prevState) => completeAll(prevState))}
       >
-        complete all
+        Complete All
       </button>
-      <form className="w-4/5 flex flex-col" onSubmit={submitNewTodo}>
+      <form className="w-5/6 flex flex-col" onSubmit={submitNewTodo}>
         <input
           placeholder="todo text"
           className="p-2 border border-black mb-2"
@@ -307,7 +270,7 @@ function App() {
         <input
           id="newTodoSubmit"
           type="submit"
-          value="Add todo"
+          value="Add Todo"
           className={
             "p-2 mb-2 w-64 mx-auto rounded-md bg-black text-white " +
             (newTodo.text
@@ -325,7 +288,7 @@ function App() {
         </button>
       </div>
       {showDeletedTodos ? (
-        <ul className="w-5/6 md:w-1/2">{deletedTodos}</ul>
+        <ul className="w-5/6 md:w-4/5">{renderTodos(true)}</ul>
       ) : null}
     </div>
   );
