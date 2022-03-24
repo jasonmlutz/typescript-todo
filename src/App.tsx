@@ -10,14 +10,16 @@ function App() {
     { id: 4, text: "Be mindful", done: false },
   ];
 
-  const initialNewTodo: NewTodo = { text: "" };
+  const initialNewTodo: NewTodo = { text: "", done: false, place: "" };
 
   const [todos, setTodos] = useState(initialTodos);
   const [newTodo, setNewTodo] = useState(initialNewTodo);
 
   type NewTodo = {
+    id?: number;
     text: string;
-    place?: Place;
+    done: false;
+    place?: string;
   };
 
   type Todo = Readonly<{
@@ -47,7 +49,7 @@ function App() {
     if (place.custom) {
       return {
         text: place.custom,
-        icon: <BsFillPinMapFill className="mx-2" />,
+        icon: <BsFillPinMapFill className="mr-2" />,
       };
     }
     return { text: null, icon: null };
@@ -78,7 +80,20 @@ function App() {
   }
 
   function buildTodo(): Todo {
-    return { ...newTodo, id: nextTodoIndex(todos), done: false };
+    if (!newTodo.place) {
+      return { text: newTodo.text, id: nextTodoIndex(todos), done: false };
+    } else {
+      // parse the place as home, work, or custom
+      return {
+        text: newTodo.text,
+        id: nextTodoIndex(todos),
+        done: false,
+        place:
+          newTodo.place === "home" || newTodo.place === "work"
+            ? newTodo.place
+            : { custom: newTodo.place },
+      };
+    }
   }
 
   function submitNewTodo(e: SyntheticEvent): void {
@@ -97,7 +112,34 @@ function App() {
     setTodos((prevState) => prevState.filter((el) => el.id !== todo.id));
   }
 
-  const renderedTodos = todos
+  function getLocations(): string[] {
+    // return the possible choices for locations for todo items
+    // ["home", "work"] + all custom locations previously used
+    let choices: string[] = ["home", "work"];
+    todos.forEach((todo) => {
+      if (todo.place && todo.place !== "home" && todo.place !== "work") {
+        choices.push(todo.place.custom.toLowerCase());
+      }
+    });
+    return choices;
+  }
+
+  const locationChoices: JSX.Element[] = getLocations().map(
+    (location, index) => (
+      <li
+        key={index}
+        className={
+          "mr-2 p-2 rounded-md border border:black bg-white flex flex-row cursor-pointer hover:bg-blue-500 hover:text-white " +
+          (newTodo.place === location ? "bg-blue-500 text-white" : "")
+        }
+        onClick={() => setNewTodo({ ...newTodo, place: location })}
+      >
+        {location}
+      </li>
+    )
+  );
+
+  const renderedTodos: JSX.Element[] = todos
     .sort((a, b) => a.id - b.id)
     .map((todo: Todo) => (
       <li key={todo.id} className="mb-2 flex flex-row justify-between">
@@ -147,19 +189,28 @@ function App() {
       >
         complete all
       </button>
-      <form className="flex flex-row pb-2" onSubmit={submitNewTodo}>
+      <form className="w-4/5 flex flex-col" onSubmit={submitNewTodo}>
         <input
           placeholder="todo text"
-          className="border border-black w-64 pl-2 flex-1"
+          className="p-2 border border-black mb-2"
           value={newTodo.text}
-          onChange={(e) => setNewTodo({ text: e.target.value })}
+          onChange={(e) => setNewTodo({ ...newTodo, text: e.target.value })}
         />
+        <input
+          placeholder="todo location (optional)"
+          className="p-2 border border-black mb-2"
+          value={newTodo.place}
+          onChange={(e) =>
+            setNewTodo({ ...newTodo, place: e.target.value.toLowerCase() })
+          }
+        />
+        <ul className="mb-2 flex flex-row justify-start">{locationChoices}</ul>
         <input
           id="newTodoSubmit"
           type="submit"
           value="Add todo"
           className={
-            "p-2 ml-2 rounded-md bg-black text-white " +
+            "p-2 mb-2 w-64 mx-auto rounded-md bg-black text-white " +
             (newTodo.text
               ? "hover:bg-gray-600 cursor-pointer"
               : "bg-gray-600 cursor-not-allowed")
