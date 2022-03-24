@@ -81,6 +81,11 @@ function App() {
     }
   }
 
+  function deleteTodo(todo: Todo): void {
+    // console.log(`deleting todo! ${todo.id}: ${todo.text}`);
+    setTodos((prevState) => prevState.filter((el) => el.id !== todo.id));
+  }
+
   const renderedTodos = todos
     .sort((a, b) => a.id - b.id)
     .map((todo: Todo) => (
@@ -111,13 +116,19 @@ function App() {
         >
           {todo.done ? "undo" : "complete"}
         </button>
+        <button
+          className="ml-2 p-2 rounded-md bg-red-900 text-white hover:bg-red-700"
+          onClick={() => deleteTodo(todo)}
+        >
+          delete
+        </button>
       </li>
     ));
 
   return (
     <div className="container mx-auto flex flex-col items-center">
       <header className="mb-2 text-2xl">TODOS</header>
-      <ul className="w-1/2">{renderedTodos}</ul>
+      <ul className="w-5/6 md:w-1/2">{renderedTodos}</ul>
       <button
         className="p-2 mb-2 rounded-md bg-black text-white hover:bg-gray-600 cursor-pointer"
         onClick={() => setTodos((prevState) => completeAll(prevState))}
