@@ -8,11 +8,13 @@ function App() {
 
   const [todos, setTodos] = useState(initialTodos);
 
-  interface Todo {
-    readonly id: number;
-    readonly text: string;
-    readonly done: boolean;
-  }
+  type Place = "home" | "work" | { custom: string };
+  type Todo = Readonly<{
+    id: number;
+    text: string;
+    done: boolean;
+    place?: Place;
+  }>;
 
   type CompletedTodo = Todo & {
     readonly done: true;
