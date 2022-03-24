@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./App.css";
 
 function App() {
   const initialTodos: Todo[] = [
@@ -20,7 +19,6 @@ function App() {
   };
 
   function toggleTodo(todo: Todo): Todo {
-    console.log(`toggle todo ${todo.id}`);
     return {
       ...todo,
       done: !todo.done,
@@ -35,9 +33,13 @@ function App() {
   }
 
   const renderedTodos = todos.map((todo: Todo) => (
-    <li key={todo.id}>
+    <li
+      key={todo.id}
+      className={"mb-2 " + (todo.done ? "line-through text-gray-700" : "")}
+    >
       {todo.text}
       <button
+        className="p-2 ml-2 rounded-md bg-black text-white hover:bg-gray-600"
         onClick={() => {
           // toggleTodo(todo);
           setTodos((prevState) => {
@@ -54,8 +56,15 @@ function App() {
   ));
 
   return (
-    <div className="App">
-      <ul>{renderedTodos}</ul>
+    <div className="container mx-auto bg-gray-300 flex flex-col items-center mb-2">
+      <header className="mb-2 text-2xl">TODOS</header>
+      <ul className="">{renderedTodos}</ul>
+      <button
+        className="p-2 mb-2 rounded-md bg-black text-white hover:bg-gray-600"
+        onClick={() => setTodos((prevState) => completeAll(prevState))}
+      >
+        complete all
+      </button>
     </div>
   );
 }
