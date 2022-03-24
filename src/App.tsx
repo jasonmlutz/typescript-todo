@@ -178,7 +178,13 @@ function App() {
           "mr-2 p-2 rounded-md border border:black bg-white flex flex-row cursor-pointer hover:bg-blue-500 hover:text-white " +
           (newTodo.place === location ? "bg-blue-500 text-white" : "")
         }
-        onClick={() => setNewTodo({ ...newTodo, place: location })}
+        onClick={() => {
+          if (newTodo.place === location) {
+            setNewTodo({ ...newTodo, place: "" });
+          } else {
+            setNewTodo({ ...newTodo, place: location });
+          }
+        }}
       >
         {location}
       </li>
