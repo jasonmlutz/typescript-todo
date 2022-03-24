@@ -1,4 +1,6 @@
 import React, { SyntheticEvent, useState } from "react";
+import { AiOutlineHome } from "react-icons/ai";
+import { BsFillBriefcaseFill, BsFillPinMapFill } from "react-icons/bs";
 
 function App() {
   const initialTodos: Todo[] = [
@@ -18,7 +20,6 @@ function App() {
     place?: Place;
   };
 
-  type Place = "home" | "work" | { custom: string };
   type Todo = Readonly<{
     id: number;
     text: string;
@@ -30,16 +31,26 @@ function App() {
     readonly done: true;
   };
 
-  function placeToString(place: Place): string | null {
-    // Takes a Place and returns a string
-    // that can be used for the place label UI
-    if (place === "home" || place === "work") {
-      return place;
-    } else if (place.custom.length) {
-      return place.custom;
-    } else {
-      return null;
+  type Place = "home" | "work" | { custom: string };
+  type PlaceLabel = {
+    text: string | null;
+    icon: JSX.Element | null;
+  };
+
+  function placeLabel(place: Place): PlaceLabel {
+    if (place === "home") {
+      return { text: null, icon: <AiOutlineHome /> };
     }
+    if (place === "work") {
+      return { text: null, icon: <BsFillBriefcaseFill /> };
+    }
+    if (place.custom) {
+      return {
+        text: place.custom,
+        icon: <BsFillPinMapFill className="mx-2" />,
+      };
+    }
+    return { text: null, icon: null };
   }
 
   function toggleTodo(todo: Todo): Todo {
@@ -98,8 +109,9 @@ function App() {
           {todo.text}
         </div>
         {todo.place ? (
-          <div className="ml-2 p-2 rounded-md border border:black bg-white">
-            {placeToString(todo.place)}
+          <div className="ml-2 p-2 rounded-md border border:black bg-white flex flex-row">
+            {placeLabel(todo.place).icon}
+            {placeLabel(todo.place).text}
           </div>
         ) : null}
         <button
