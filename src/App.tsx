@@ -78,15 +78,16 @@ function App() {
   ));
 
   return (
-    <div className="container mx-auto bg-gray-300 flex flex-col items-center mb-2">
+    <div className="container mx-auto flex flex-col items-center">
       <header className="mb-2 text-2xl">TODOS</header>
-      <ul className="">{renderedTodos}</ul>
+      <ul className="w-1/2">{renderedTodos}</ul>
       <button
         className="p-2 mb-2 rounded-md bg-black text-white hover:bg-gray-600"
         onClick={() => setTodos((prevState) => completeAll(prevState))}
       >
         complete all
       </button>
+      <div className="pb-2 text-lg">Add todo</div>
     </div>
   );
 }
